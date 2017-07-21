@@ -1,7 +1,7 @@
 all: build
 
 build:
-	clang main.c -o gb -g
+	clang *.c -o gb -g -I /usr/local/include -lSDL2
 
 run: build
 	./gb
