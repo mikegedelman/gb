@@ -100,7 +100,7 @@ void gameboy_destroy(gb_t *gb) {
 uint8_t update(gb_t *gb)
 {
 	display_update(gb->displ);
-	audio_update(gb->audio);
+	// audio_update(gb->audio);
 	interrupts(gb->mem, cycles);
 	
 	return 1;
@@ -118,13 +118,13 @@ void* cpu_worker(void *arg)
 		// 	breakF = 1;
 		// }
 		// 	// printf("%02x\n", gb->cpu->pc);
-		// 	uint8_t *cur_instr = gb->cpu->mem + gb->cpu->pc;
-		// 	uint8_t op_code = cur_instr[0];
-		// 	uint8_t a1 = cur_instr[1];
-		// 	uint8_t a2 = cur_instr[2];
+			// uint8_t *cur_instr = gb->cpu->mem + gb->cpu->pc;
+			// uint8_t op_code = cur_instr[0];
+			// uint8_t a1 = cur_instr[1];
+			// uint8_t a2 = cur_instr[2];
 
-		// 	printf("%02x %02x %02x| ", op_code, a1, a2);
-		// 	cpu_print(gb->cpu);
+			// printf("%02x %02x %02x| ", op_code, a1, a2);
+			// cpu_print(gb->cpu);
 		// 	// printf("\n%02x\n", gb->cpu->mem[0xFF42]);
 
 		// if (breakF) {

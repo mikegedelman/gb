@@ -115,7 +115,7 @@ void display_step(display_t *d)
 uint8_t display_update(display_t *d)
 {
 	display_step(d);
-	SDL_Delay(17); /* shoot for 60 hz */
+	SDL_Delay(1); /* ??? */
 
 	return 1;
 }

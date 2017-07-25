@@ -594,58 +594,19 @@ uint8_t step(cpu_t *cpu)
 		case 0x01: /* LD BC,d16  a1 fe a2 ff | B C  = ff fe */
 			setBC(a1, a2);
 			sz = 3;
+			cycles = 12;
 			break;
 
-		case 0x02: // LD (BC), A
-			memBC = A;
-			sz = 1;
-			break;
-
-		case 0x06: // LD B,d8
-			B = a1;
-			sz = 2;
-			cycles = 8;
-			break;
-
-		case 0x0E: // LD C, d8
-			C = a1;
-			sz = 2;
-			break;
-
-		case 0x11: // LD DE,d16 
+		case 0x11: /* LD DE, d16 */
 			setDE(a1, a2);
 			sz = 3;
 			cycles = 12;
-			break; 
-
-		case 0x1A: // LD A,(DE) 
-			A = memDE;
-			sz = 1;
-			cycles = 8;
 			break;
 
-		case 0x21: // LD HL, d16
+		case 0x21: /* LD HL, d16 */
 			setHL(a1, a2);
 			sz = 3;
-			break;
-
-		case 0x22: // LD (HL+),A
-			memHL = A;
-			inc16(H, L);
-			sz = 1;
-			cycles = 8;
-			break;
-
-		case 0x1E: // LD E, d8
-			E = a1;
-			sz = 2;
-			cycles = 8;
-			break;
-
-		case 0x2E: // LD L, d8
-			L = a1;
-			sz = 2;
-			cycles = 8;
+			cycles = 12;
 			break;
 
 		case 0x31: // LD SP, d16
@@ -655,44 +616,139 @@ uint8_t step(cpu_t *cpu)
 			sz = 3;
 			break;
 
-		case 0x32: // LD (HL-),A
+		case 0x02: /* LD (BC), A */
+			memBC = A;
+			sz = 1;
+			break;
+
+		case 0x12: /* LD (DE), A */
+			memDE = A;
+			cycles = 8;
+			break;
+
+		case 0x22: /* LD (HL+),A */
+			memHL = A;
+			inc16(H, L);
+			sz = 1;
+			cycles = 8;
+			break;
+
+		case 0x32: /* LD (HL-),A */
 			memHL = A;
 			dec16(H, L);
 			sz = 1;
 			cycles = 8;
 			break;
 
-		case 0x3E: // LD A, d8
+		case 0x06: // LD B,d8
+			B = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x16: /* LD D, d8 */
+			D = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x26: /* LD H, d8 */
+			H = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x36: /* LD (HL), d8 */
+			memHL = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x0E: /* LD C, d8 */
+			C = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x1E: /* LD E, d8 */
+			E = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x2E: /* LD L, d8 */
+			L = a1;
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0x3E: /* LD A, d8 */
 			A = a1;
 			sz = 2;
 			cycles = 8;
 			break;
 
-		case 0xE0: // LDH (a8),A
+		case 0x0A: /* LD A, (BC) */
+			A = memBC;
+			cycles = 8;
+			break;
+
+		case 0x1A: /* LD A, (DE)  */
+			A = memDE;
+			sz = 1;
+			cycles = 8;
+			break;
+
+		case 0x2A: /* LD A, (HL+) */
+			A = memHL;
+			inc16(H, L);
+			cycles = 8;
+			break;
+
+		case 0x3A: /* LD A, (HL-) */
+			A = memHL;
+			dec16(H, L);
+			cycles = 8;
+			break;
+
+		case 0xE0: /* LDH (a8),A */
 			m[0xFF00 + a1] = A;
 			sz = 2;
 			cycles = 12;
 			break;
 
+		case 0xF0: /* LDH A, (a8) */
+			A = m[0xFF00 + a1];
+			sz = 2;
+			cycles = 12;
+			break;
 
-		case 0xE2: // LD (C), A 
+		case 0xE2: /* LD (C), A  */
 			m[0xFF00 + C] = A;
 			sz = 1;
 			cycles = 8;
 			break;
 
-		case 0xEA: // LD (a16), A
+		case 0xF2: /* LD A, (C) */
+			A = m[0xFF00 + C];
+			sz = 2;
+			cycles = 8;
+			break;
+
+		case 0xEA: /* LD (a16), A */
 			work.u8[0] = a1;
 			work.u8[1] = a2;
 			m[work.u16] = A;
 			sz = 3;
-			cycles = 12;
+			cycles = 16;
 			break;
 
-		case 0xF0: // LDH A,(a8)
-			A = m[0xFF00 + a1];
-			sz = 2;
-			cycles = 12;
+		case 0xFA: /* LD A, (a16) */
+			work.u8[0] = a1;
+			work.u8[1] = a2;
+			A = m[work.u16];
+			sz = 3;
+			cycles = 16;
 			break;
 
 		/* Arithmetic */
@@ -1163,8 +1219,7 @@ uint8_t step(cpu_t *cpu)
 			cycles = 8;
 			break;
 
-		// Rotates
-		case 0x17: // RLA
+		case 0x17: /* RLA */
 			tmp8 = c & 1;
 			setC(A & 0x80);
 			A = A << 1;
@@ -1175,7 +1230,37 @@ uint8_t step(cpu_t *cpu)
 			sz = 1;
 			break;
 
-		// Jumps and calls
+		case 0x2F: /* CPL: complement of A */
+			A ^= 0xFF;
+			setN(1);
+			setH(1);
+			break;
+
+		/* Jumps and calls */
+		case 0x20: // JR NZ,r8 (signed) NZ == (Z == 0) (if Z bit not set)
+			if (!z) {
+				work.u8[0] = a1;
+				sz = 0; 
+				cpu->pc = 2 + cpu->pc + work.i8[0];
+				cycles = 12;
+			} else {
+				sz = 2;
+				cycles = 8;
+			}
+			break;
+
+		case 0x30: /* JR NC, r8 */
+			if (!c) {
+				work.u8[0] = a1;
+				sz = 0; 
+				cpu->pc = 2 + cpu->pc + work.i8[0];
+				cycles = 12;
+			} else {
+				sz = 2;
+				cycles = 8;
+			}
+			break;
+
 		case 0x18: // JR r8
 			work.u8[0] = a1;
 			sz = 0;
@@ -1183,17 +1268,8 @@ uint8_t step(cpu_t *cpu)
 			cycles = 12;
 			break;
 
-		case 0x20: // JR NZ,r8 (signed) NZ == (Z == 0) (if Z bit not set)
-			if (!z) {
-				work.u8[0] = a1;
-				sz = 0; 
-				cpu->pc = 2 + cpu->pc + work.i8[0];
-			} else {
-				sz = 2;
-			}
-			break;
 
-		case 0x28: // JR Z,r8 (signed) NZ == (Z == 0) (if Z bit set)
+		case 0x28: /* JR Z,r8 (signed) NZ == (Z == 0) (if Z bit set) */
 			if (z) {
 				work.u8[0] = a1;
 				sz = 0; 
@@ -1203,7 +1279,17 @@ uint8_t step(cpu_t *cpu)
 			}
 			break;
 
-		case 0xC0: // RET NZ PC=(SP), SP=SP+2
+		case 0x38: /* JR C, r8 */
+			if (c) {
+				work.u8[0] = a1;
+				sz = 0; 
+				cpu->pc = 2 + cpu->pc + work.i8[0];
+			} else {
+				sz = 2;
+			}
+			break;
+
+		case 0xC0: /* RET NZ PC=(SP), SP=SP+2 */
 			if (!z) {
 				PC = m[SP];
 				SP += 2;
@@ -1213,6 +1299,45 @@ uint8_t step(cpu_t *cpu)
 			}
 			sz = 1;
 			break;
+
+		case 0xD0: /* RET NC */
+			if (!c) {
+				PC = m[SP];
+				SP += 2;
+				cycles = 20;
+			} else {
+				cycles = 8;
+			}
+			sz = 1;
+			break;
+
+
+		case 0xC2: /* JP NZ, a16 */
+			if (!z) {
+				work.u8[0] = a1;
+				work.u8[1] = a2;
+				cpu->pc = work.u16;
+				sz = 0;
+				cycles = 16;
+			} else {
+				cycles = 12;
+				sz = 3;
+			}
+			break;
+
+		case 0xC3: /* JP NC, a16 */
+			if (!c) {
+				work.u8[0] = a1;
+				work.u8[1] = a2;
+				cpu->pc = work.u16;
+				sz = 0;
+				cycles = 16;
+			} else {
+				cycles = 12;
+				sz = 3;
+			}
+			break;
+
 
 		case 0xCD: // call a16: push SP: SP=SP-2, (SP)=PC, PC=nn
 			PC += 3;
@@ -1263,14 +1388,17 @@ uint8_t step(cpu_t *cpu)
 			break;
 
 		// Misc
-
-
 		case 0x76: /* HALT */
 			printf("Halt\n");
 			exit(1);
 
+		case 0xF3: /* DI TODO */
+			break;
+		case 0xFB: /* EI TODO */
+			break;
+
 		default:
-			// printf("Unknown op code: %02x\n", op_code);
+			printf("Unknown op code: %02x\n", op_code);
 			// exit(1);
 			sz = 0;
 	}
